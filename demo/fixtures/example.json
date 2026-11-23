@@ -1,0 +1,80 @@
+{
+  "scannedAt": "2026-11-22T19:30:00Z",
+  "range": "192.0.2.0/24",
+  "total": 254,
+  "done": 254,
+  "alive": 6,
+  "partial": false,
+  "hosts": [
+    {
+      "ip": "192.0.2.1",
+      "alive": true,
+      "ms": 1,
+      "mac": "00:00:5e:00:00:01",
+      "vendor": "Documentation",
+      "hostname": "gateway.example",
+      "hostnameSource": "dns",
+      "ports": [22, 80, 443]
+    },
+    {
+      "ip": "192.0.2.10",
+      "alive": true,
+      "ms": 4,
+      "mac": "02:00:00:00:00:0a",
+      "vendor": "Example Files",
+      "hostname": "files.example",
+      "hostnameSource": "dns",
+      "ports": [445]
+    },
+    {
+      "ip": "192.0.2.15",
+      "alive": true,
+      "ms": 8,
+      "mac": "02:00:00:00:00:0f",
+      "vendor": "Example Print",
+      "hostname": "print.example",
+      "hostnameSource": "mdns",
+      "ports": [9100]
+    },
+    {
+      "ip": "192.0.2.20",
+      "alive": true,
+      "ms": 12,
+      "mac": "02:00:00:00:00:14",
+      "vendor": "Example Desk",
+      "hostname": "desk.example",
+      "hostnameSource": "dns",
+      "ports": []
+    },
+    {
+      "ip": "192.0.2.23",
+      "alive": true,
+      "ms": 18,
+      "mac": "02:00:00:00:00:17",
+      "vendor": "Example Media",
+      "hostname": "media.example",
+      "hostnameSource": "mdns",
+      "ports": [80]
+    },
+    {
+      "ip": "192.0.2.40",
+      "alive": true,
+      "ms": 27,
+      "mac": "02:00:00:00:00:28",
+      "vendor": "Example Lab",
+      "hostname": "lab.example",
+      "hostnameSource": "dns",
+      "ports": [22]
+    },
+    {
+      "ip": "192.0.2.50",
+      "alive": false,
+      "ms": null,
+      "mac": "",
+      "vendor": "",
+      "hostname": "",
+      "hostnameSource": "",
+      "ports": []
+    }
+  ]
+}

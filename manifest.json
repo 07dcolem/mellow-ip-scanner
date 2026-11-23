@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.07dcolem.mellow-ip-scan",
+  "name": "Mellow IP Scan",
+  "version": "0.1.0",
+  "author": "Dylan Coleman",
+  "license": "MIT",
+  "description": "Keyboard-first local network scanner for the Omarchy bar.",
+  "kinds": [
+    "service",
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "keepLoaded": true,
+  "barWidget": {
+    "displayName": "Mellow IP Scan",
+    "description": "Keyboard-first local network scanner for the Omarchy bar.",
+    "category": "Network",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "range": "",
+      "portChecks": false,
+      "ports": "22, 80, 443, 445, 3389, 9100",
+      "hideDead": true,
+      "maxLatencyMs": 0,
+      "openPortsOnly": false,
+      "presets": "[]",
+      "columns": "hostname,ms,mac,vendor,ports,source",
+      "hotkeyDismissed": false
+    },
+    "schema": [
+      {
+        "key": "portChecks",
+        "type": "boolean",
+        "label": "Check TCP ports",
+        "defaultValue": false
+      },
+      {
+        "key": "hideDead",
+        "type": "boolean",
+        "label": "Hide hosts that did not answer",
+        "defaultValue": true
+      },
+      {
+        "key": "openPortsOnly",
+        "type": "boolean",
+        "label": "Only hosts with an open port",
+        "defaultValue": false
+      },
+      {
+        "key": "maxLatencyMs",
+        "type": "integer",
+        "label": "Maximum latency (ms, 0 is off)",
+        "min": 0,
+        "max": 10000,
+        "step": 1,
+        "defaultValue": 0
+      }
+    ]
+  }
+}

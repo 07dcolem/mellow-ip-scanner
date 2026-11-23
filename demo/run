@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+fixture="$root/demo/fixtures/example.json"
+
+python3 - "$root" "$fixture" <<'PY'
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+fixture = Path(sys.argv[2])
+spec = importlib.util.spec_from_file_location("mellow_scan", root / "bin" / "scan.py")
+scan = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(scan)
+document = json.loads(fixture.read_text(encoding="utf-8"))
+scan.validate_document(document)
+print(f"Demo fixture is valid: {fixture}")
+print("Addresses are documentation examples. A marketplace screenshot needs a reversible live-shell capture of this fixture.")
+PY
