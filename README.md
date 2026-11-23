@@ -4,9 +4,9 @@ Keyboard-first local IPv4 scanner for the Omarchy bar. The bar shows how many ho
 
 ![Mellow IP Scan showing a fictional scan of 192.0.2.0/24](preview.png)
 
-Left click opens the dropdown. Middle click starts or stops. Right click detects the subnet again. The first time you open it, if no range is saved, it picks one: the network on the default route when that network is a sensible size, otherwise another private LAN. Tunnel, container, and point-to-point addresses are skipped.
+The first time you open it, if no range is saved, it picks one: the network on the default route when that network is a sensible size, otherwise another private LAN. Tunnel, container, and point-to-point addresses are skipped.
 
-Inside the dropdown, `v` or Open full (v) opens a window titled Mellow IP Scan and closes the dropdown. The window has no global key. Closing either surface leaves a running scan alone.
+From the dropdown, `v` or Open full (v) opens a window titled Mellow IP Scan and closes the dropdown. The window has no global key. Closing either surface leaves a running scan alone.
 
 The last-scan line uses the same date and time pattern as the clock on the bar. It keeps this panel's own type.
 
@@ -62,32 +62,75 @@ An unresolved name is shown as a dash. If a column needs a program or data file 
 
 ## Keyboard
 
+Open the dropdown from the bar. After you set it, Super+Alt+N opens that same dropdown. Until then, this command opens it too:
+
+```bash
+omarchy-shell shell toggle io.github.07dcolem.mellow-ip-scan
+```
+
+The window has no key of its own. In the dropdown, `v` opens it and closes the dropdown.
+
+`j` and `k`, or the up and down arrows, move the cursor and wrap. Enter and Space do the same thing. Esc returns to the host list, and from the host list it closes. Letter keys work on every page. They pause while a text line is being edited, so a letter you type goes into the line.
+
+`h` and `l`, and the left and right arrows, move left and right in every Omarchy panel. This panel does not use them. The hostname key is `n`.
+
+### Host list
+
+The cursor is one host, kept in address order. Enter or Space copies its IP. `c`, `m`, and `n` copy the IP, the MAC, and the hostname. `w` sends Wake-on-LAN for that host. `s` starts or stops. `r` detects the subnet again. `e` exports the hosts on screen. `f` opens Filters. `o` opens range, ports, columns, and presets.
+
+Copy, export, wake, and re-detect leave a running scan alone. `s` is what starts and stops it.
+
+On the dropdown, while Set Super+Alt+N (b) is on screen, `b` writes that chord and `x` dismisses the offer. After the offer is gone, `x` on the host list does nothing. Delete does the same as `x`.
+
+### Filters
+
+`f` opens four rows, in order: hide hosts that did not answer, only hosts with an open port, the text line, and the max latency in milliseconds. `j` and `k` move between them. The text line and the latency line show the cursor. An empty line keeps its gray example until the cursor lands on it. Enter or Space toggles a switch or starts the line. `0` in the latency line turns that limit off.
+
+Filters never start a scan. Dead hosts stay hidden until you show them. You can also hide hosts above a latency, keep only hosts with an open port, or match the IP, hostname, MAC, or vendor.
+
+Esc, or Back, returns to the host you left. From this page, `c`, `m`, `n`, and `w` still use that host.
+
+### Range, ports, columns, and presets
+
+`o` opens the rows in this order: range, re-detect subnet, the TCP-port switch, the port list, the six columns, the preset name, Save preset, then each saved preset. Enter or Space edits a line, re-detects, toggles port checks, raises a column, saves the preset, or applies that preset's range. `x` lowers the focused column or removes the focused preset. On this page `x` does not dismiss the hotkey offer. Esc, or Back, returns to the host you left.
+
+An empty range, port list, or preset name shows a gray example, such as `192.0.2.0/24` or `home`, until the cursor lands on it.
+
+### Editing a line
+
+While a line is open, the page keys wait. Left and right, and Home and End, move the caret. Backspace and Delete remove characters. Enter keeps what you typed. Esc puts the previous text back. The line does not read the clipboard. It accepts printable ASCII, up to that line's length cap.
+
+### Keys
+
 | Key | Action |
 | --- | --- |
-| `j` / `k`, arrows | Move |
-| Enter | Copy the focused IP |
+| `j` / `k`, up / down | Move. Wraps |
+| Enter, Space | When you are not editing a line: on the host list, copy the focused IP. On Filters, toggle or start a line. On Options, edit, re-detect, toggle, raise a column, save, or apply a preset |
 | `s` | Start or stop |
 | `r` | Detect the subnet again |
 | `f` | Filters |
 | `o` | Range, ports, columns, and presets |
-| `c` `m` `n` | Copy IP, MAC, and hostname |
-| `e` | Export the filtered view |
-| `w` | Wake-on-LAN for the focused host |
+| `c` `m` `n` | Copy IP, MAC, and hostname of the host you left |
+| `e` | Export the hosts on screen |
+| `w` | Wake-on-LAN for the host you left |
 | `v` | Open the full window, from the dropdown only |
-| `x` | Lower the focused column, or remove the focused preset |
-| Esc | Step back, then close |
-
-`h` and `l` move left and right in every Omarchy panel, so hostname is `n`. Copy, export, wake, and re-detect keep a running scan going. `s` is what starts and stops it. Hosts stay in address order while results arrive.
-
-Filters never start a new scan. Dead hosts are hidden until you show them. You can also hide hosts above a latency, keep only hosts with an open port, or match the IP, hostname, MAC, or vendor.
-
-Range, ports, the filter text, the latency field, and a preset name are edited on a plain line. Click a field, or press Enter on it. Empty option fields show a gray example, such as `192.0.2.0/24` or `home`, until the field is clicked or the keyboard cursor moves onto it. That line does not read the clipboard.
+| `b` | Set Super+Alt+N, from the dropdown, while the offer is showing |
+| `x`, Delete | When you are not editing a line: on the host list, while the offer is showing, dismiss it. On Options, lower the focused column or remove the focused preset |
+| Esc | Back to the same host, then close |
+| Left / right, Home, End | While editing a line, move the caret |
+| Backspace, Delete | While editing a line, remove characters |
+| Enter | While editing a line, keep the text |
+| Esc | While editing a line, cancel |
 
 ## Mouse
 
-Click a host to select it. Double-click it to copy the IP. Scan, Filters, Options, copy, Export, and Wake are buttons on the list. Click a preset to use its range. Remove deletes that preset. Re-detect subnet and Save preset are clickable rows.
+On the bar, left click opens the dropdown. Middle click starts or stops. Right click detects the subnet again.
 
-When more hosts sit below the visible list, the bottom edge fades and a vertical scrollbar appears. The wheel, the scrollbar, and `j` / `k` move through the rows.
+Click a host to select it. Double-click it to copy the IP. Scan, Filters, Options, Copy IP, Copy MAC, Copy name, Export, and Wake are buttons for the same actions as the keys. Click a field to edit it. An empty field's gray example disappears when you click it. Click a column to raise it, or Lower to move it down. Click a preset to use its range. Remove deletes that preset. Re-detect subnet, Save preset, and Back are rows. Back returns to the same host.
+
+Open full (v) is the same as `v`. Set Super+Alt+N (b) is the same as `b`. The x beside the offer is the same as `x` on the host list.
+
+When more hosts sit below the visible list, the bottom edge fades and a vertical scrollbar appears. The wheel and the scrollbar move through the rows.
 
 ## Export, presets, and Wake-on-LAN
 
@@ -99,7 +142,7 @@ Wake-on-LAN sends one UDP packet to port 9, to the broadcast address of the curr
 
 ## Hotkey
 
-The dropdown offers Super+Alt+N when that chord is free and you have not dismissed the offer. The offer sits under Open full and the host count. Set writes one marked block at the end of `~/.config/hypr/bindings.lua`, reloads Hyprland, and puts the previous file back if the reload reports a new config error. Nothing is written until you click Set Super+Alt+N. The x beside it saves that you do not want the offer. If the chord is already used, the button is not offered.
+The dropdown offers Super+Alt+N when that chord is free and you have not dismissed the offer. The offer sits under Open full and the host count. `b`, or Set Super+Alt+N (b), writes one marked block at the end of `~/.config/hypr/bindings.lua`, reloads Hyprland, and puts the previous file back if the reload reports a new config error. Nothing is written until you press `b` or click that button. On the host list, `x` dismisses the offer, and the x beside it does the same. That choice is saved, and the offer does not come back. If the chord is already used, the offer is not shown. The full window does not show it.
 
 ```lua
 -- mellow-ip-scan: begin

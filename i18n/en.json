@@ -49,7 +49,7 @@
   "wol.ok": "Wake sent",
   "wol.fail": "Wake failed",
   "window.open": "Open full (v)",
-  "hotkey.offer": "Set Super+Alt+N",
+  "hotkey.offer": "Set Super+Alt+N (b)",
   "hotkey.dismiss": "x",
   "hotkey.dismissTip": "Don't ask again",
   "hotkey.ours": "Super+Alt+N",

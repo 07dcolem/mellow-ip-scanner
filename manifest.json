@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.07dcolem.mellow-ip-scan",
   "name": "Mellow IP Scan",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Dylan Coleman",
   "license": "MIT",
   "description": "Keyboard-first local network scanner for the Omarchy bar.",

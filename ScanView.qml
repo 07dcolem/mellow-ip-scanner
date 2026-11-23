@@ -10,6 +10,7 @@ FocusScope {
 
     property var service: null
     property bool showWindowButton: true
+    readonly property bool hotkeyOfferVisible: showWindowButton && service && service.noted && service.hotkeyState === "free" && !service.hotkeyDismissed
     property string page: "list"
     property bool optionCursorUsed: false
     onPageChanged: {
@@ -109,14 +110,63 @@ FocusScope {
             hostList.contentY = y + rowHeight - hostList.height
     }
 
+    // The list cursor is the host on screen. Other pages keep the host you
+    // left, so copy and wake do not treat a filter row as a host index.
+    function rememberedHost() {
+        if (page === "list")
+            return cursor >= 0 && cursor < rows.length ? rows[cursor] : null
+        if (focusedIp === "")
+            return null
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i] && rows[i].ip === focusedIp)
+                return rows[i]
+        }
+        return null
+    }
+
+    function rememberListHost() {
+        if (page !== "list")
+            return
+        if (cursor >= 0 && cursor < rows.length && rows[cursor] && rows[cursor].ip) {
+            focusedIp = rows[cursor].ip
+            followIp = true
+        }
+    }
+
+    function backToList() {
+        page = "list"
+        cursor = 0
+        if (followIp && focusedIp !== "") {
+            for (var i = 0; i < rows.length; i++) {
+                if (rows[i].ip === focusedIp) {
+                    cursor = i
+                    break
+                }
+            }
+        }
+    }
+
+    function openFilters() {
+        rememberListHost()
+        page = "filters"
+        cursor = 0
+    }
+
+    function openOptions() {
+        rememberListHost()
+        page = "options"
+        cursor = 0
+    }
+
     function focusedText(kind) {
-        if (!focused)
+        var host = rememberedHost()
+        if (!host)
             return ""
         if (kind === "ip")
-            return focused.ip
+            return host.ip
         if (kind === "mac")
-            return focused.mac
-        return focused.hostname
+            return host.mac
+        return host.hostname
     }
 
     function isoWeekToken(date) {
@@ -520,22 +570,21 @@ FocusScope {
         blocked: root.editing
         onMoveRequested: function(dx, dy) { if (dy !== 0) root.move(dy) }
         onActivateRequested: root.activate()
-        onDeleteRequested: root.deletePreset()
-        onCloseRequested: {
-            if (root.page !== "list") {
-                root.page = "list"
-                root.cursor = 0
-                if (root.followIp && root.focusedIp !== "") {
-                    for (var i = 0; i < root.rows.length; i++) {
-                        if (root.rows[i].ip === root.focusedIp) {
-                            root.cursor = i
-                            break
-                        }
-                    }
-                }
-            } else {
-                root.closeRequested()
+        onDeleteRequested: {
+            // On the host list, x matches the dismiss button. On Options it
+            // still lowers a column or removes a preset.
+            if (root.page === "list" && root.hotkeyOfferVisible) {
+                if (root.service)
+                    root.service.dismissPanelHotkey()
+                return
             }
+            root.deletePreset()
+        }
+        onCloseRequested: {
+            if (root.page !== "list")
+                root.backToList()
+            else
+                root.closeRequested()
         }
         onTextKey: function(text) {
             var key = String(text || "")
@@ -547,11 +596,9 @@ FocusScope {
             } else if (key === "r" && root.service) {
                 root.service.redetect()
             } else if (key === "f") {
-                root.page = "filters"
-                root.cursor = 0
+                root.openFilters()
             } else if (key === "o") {
-                root.page = "options"
-                root.cursor = 0
+                root.openOptions()
             } else if (key === "c" && root.service) {
                 root.service.copyText(root.focusedText("ip"))
             } else if (key === "m" && root.service) {
@@ -560,10 +607,14 @@ FocusScope {
                 root.service.copyText(root.focusedText("hostname"))
             } else if (key === "e" && root.service) {
                 root.service.exportHosts(root.rows)
-            } else if (key === "w" && root.service && root.focused) {
-                root.service.wake(root.focused.mac)
+            } else if (key === "w" && root.service) {
+                var wakeHost = root.rememberedHost()
+                if (wakeHost)
+                    root.service.wake(wakeHost.mac)
             } else if (key === "v" && root.showWindowButton) {
                 root.launchWindow()
+            } else if ((key === "b" || key === "B") && root.hotkeyOfferVisible && root.service) {
+                root.service.setPanelHotkey()
             }
         }
 
@@ -649,7 +700,7 @@ FocusScope {
 
                     Row {
                         id: hotkeyRow
-                        visible: root.showWindowButton && root.service && root.service.noted && root.service.hotkeyState === "free" && !root.service.hotkeyDismissed
+                        visible: root.hotkeyOfferVisible
                         width: parent.width
                         height: visible ? implicitHeight : 0
                         spacing: Style.space(4)
@@ -968,10 +1019,7 @@ FocusScope {
                         horizontalPadding: root.actionPad
                         verticalPadding: Style.space(4)
                         text: Plain.plain(strings.t("mouse.filters"), 16)
-                        onClicked: {
-                            root.page = "filters"
-                            root.cursor = 0
-                        }
+                        onClicked: root.openFilters()
                     }
                     Button {
                         bordered: true
@@ -980,10 +1028,7 @@ FocusScope {
                         horizontalPadding: root.actionPad
                         verticalPadding: Style.space(4)
                         text: Plain.plain(strings.t("mouse.options"), 16)
-                        onClicked: {
-                            root.page = "options"
-                            root.cursor = 0
-                        }
+                        onClicked: root.openOptions()
                     }
                     Button {
                         bordered: true
@@ -1028,7 +1073,11 @@ FocusScope {
                         horizontalPadding: root.actionPad
                         verticalPadding: Style.space(4)
                         text: Plain.plain(strings.t("mouse.wake"), 16)
-                        onClicked: if (root.service && root.focused) root.service.wake(root.focused.mac)
+                        onClicked: {
+                            var wakeHost = root.rememberedHost()
+                            if (root.service && wakeHost)
+                                root.service.wake(wakeHost.mac)
+                        }
                     }
                 }
 
@@ -1076,6 +1125,7 @@ FocusScope {
                     width: parent.width
                     maximumLength: 64
                     placeholder: strings.t("filter.query")
+                    selected: root.page === "filters" && root.cursor === 2
                     text: root.query
                     onStarted: root.quietOthers(queryLine)
                     onAccepted: function(value) {
@@ -1089,6 +1139,7 @@ FocusScope {
                     width: parent.width
                     maximumLength: 6
                     placeholder: strings.t("filter.latency")
+                    selected: root.page === "filters" && root.cursor === 3
                     text: root.service ? String(root.service.maxLatencyMs) : "0"
                     onStarted: root.quietOthers(latencyLine)
                     onAccepted: function(value) {
@@ -1101,10 +1152,7 @@ FocusScope {
                 }
                 ActionRow {
                     label: strings.t("mouse.back")
-                    onActivated: {
-                        root.page = "list"
-                        root.cursor = 0
-                    }
+                    onActivated: root.backToList()
                 }
                 Text {
                     textFormat: Text.PlainText
@@ -1338,18 +1386,7 @@ FocusScope {
                 }
                 ActionRow {
                     label: strings.t("mouse.back")
-                    onActivated: {
-                        root.page = "list"
-                        root.cursor = 0
-                        if (root.followIp && root.focusedIp !== "") {
-                            for (var i = 0; i < root.rows.length; i++) {
-                                if (root.rows[i].ip === root.focusedIp) {
-                                    root.cursor = i
-                                    break
-                                }
-                            }
-                        }
-                    }
+                    onActivated: root.backToList()
                 }
                 Text {
                     width: parent.width

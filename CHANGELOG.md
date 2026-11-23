@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1
+
+- The filter text and the latency line show the keyboard cursor.
+- Filters Back returns to the host you left, the same as Esc and Back on Options.
+- Copy and Wake use that host from Filters and Options.
+- On the dropdown, `b` sets Super+Alt+N while the offer is showing. `x` on the host list dismisses the offer. Nothing is written until `b` or the Set button.
+
 ## 0.1.0
 
 - First release of Mellow IP Scan.
