@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Setting Super+Alt+N reads `bindings.lua` again after the Hyprland checks and appends the marked block to that current file.
+- If the reload reports a new config error, only that marked block is removed. Bindings saved while the check was running stay in the file.
+
 ## 0.1.1
 
 - The filter text and the latency line show the keyboard cursor.

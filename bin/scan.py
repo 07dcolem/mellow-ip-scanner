@@ -1148,6 +1148,39 @@ def render_panel_hotkey_bytes(blob):
     return "set", rendered
 
 
+def splice_hotkey_block(blob):
+    """Remove one exact hotkey block. None means the file must be left as it is."""
+    if not isinstance(blob, bytes) or len(blob) > MAX_BINDINGS or b"\x00" in blob:
+        return None
+    try:
+        text = blob.decode("utf-8", "strict")
+    except UnicodeError:
+        return None
+    block = HOTKEY_BLOCK
+    if text.count(block) != 1:
+        return None
+    index = text.find(block)
+    if index > 0 and text[index - 1] != "\n":
+        return None
+    updated = text[:index] + text[index + len(block):]
+    try:
+        rendered = updated.encode("utf-8")
+    except UnicodeError:
+        return None
+    if len(rendered) > MAX_BINDINGS:
+        return None
+    return rendered
+
+
+def replace_if_current(dirfd, name, expected, data, limit):
+    """Write data only while the file is still expected. A newer file is kept."""
+    loaded = read_shared(dirfd, name, limit)
+    if loaded is None or loaded[0] != expected:
+        return False
+    write_shared(dirfd, name, data, loaded[1], limit)
+    return True
+
+
 def binds_include_panel_chord(blob):
     try:
         rows = json.loads(blob)
@@ -1260,6 +1293,38 @@ def live_panel_chord():
     return binds_include_panel_chord(_hyprctl(["binds", "-j"], 5, 1024 * 1024))
 
 
+def _append_fresh_hotkey(dirfd):
+    """Append the block to the file from a new read. A save in between is kept."""
+    for _attempt in (1, 2):
+        loaded = read_shared(dirfd, BINDINGS_NAME, MAX_BINDINGS)
+        if loaded is None:
+            return "broken", False
+        blob, _mode = loaded
+        rendered_state, rendered = render_panel_hotkey_bytes(blob)
+        if rendered_state == "broken":
+            return "broken", False
+        if rendered_state != "set" or rendered is None:
+            return rendered_state, False
+        if replace_if_current(dirfd, BINDINGS_NAME, blob, rendered, MAX_BINDINGS):
+            return "ours", True
+    return "free", False
+
+
+def _drop_fresh_hotkey(dirfd):
+    """Remove one exact block from the current file. Never write an older copy back."""
+    for _attempt in (1, 2):
+        loaded = read_shared(dirfd, BINDINGS_NAME, MAX_BINDINGS)
+        if loaded is None:
+            return False
+        blob, _mode = loaded
+        stripped = splice_hotkey_block(blob)
+        if stripped is None or stripped == blob:
+            return False
+        if replace_if_current(dirfd, BINDINGS_NAME, blob, stripped, MAX_BINDINGS):
+            return True
+    return False
+
+
 def panel_hotkey(home, write):
     """Read the user bindings. write=True appends the block and reloads Hyprland."""
     dirfd = open_dir_chain(home, BINDINGS_DIR, lock_leaf=False, create=False)
@@ -1267,8 +1332,8 @@ def panel_hotkey(home, write):
         loaded = read_shared(dirfd, BINDINGS_NAME, MAX_BINDINGS)
         if loaded is None:
             return "broken", False
-        blob, mode = loaded
-        rendered_state, rendered = render_panel_hotkey_bytes(blob)
+        blob, _mode = loaded
+        rendered_state, _rendered = render_panel_hotkey_bytes(blob)
         if rendered_state == "broken":
             return "broken", False
         file_state = "free" if rendered_state == "set" else rendered_state
@@ -1279,21 +1344,25 @@ def panel_hotkey(home, write):
                 return "broken", False
             raise
         state = combine_hotkey(file_state, live)
-        if not write or state != "free" or rendered is None:
+        if not write or state != "free":
             return state, False
+        # binds and configerrors wait on Hyprland. The file read above is stale
+        # after that wait, so the write and any undo both use a later read.
         before = _hyprctl(["configerrors"], 5, 65536)
-        write_shared(dirfd, BINDINGS_NAME, rendered, mode, MAX_BINDINGS)
+        state, wrote = _append_fresh_hotkey(dirfd)
+        if not wrote:
+            return state, False
         try:
             _hyprctl(["reload"], 8, 65536)
             after = _hyprctl(["configerrors"], 5, 65536)
             if before.strip() != after.strip():
                 raise ScanError("hyprland reported new config errors")
         except ScanError:
-            write_shared(dirfd, BINDINGS_NAME, blob, mode, MAX_BINDINGS)
-            try:
-                _hyprctl(["reload"], 8, 65536)
-            except ScanError:
-                pass
+            if _drop_fresh_hotkey(dirfd):
+                try:
+                    _hyprctl(["reload"], 8, 65536)
+                except ScanError:
+                    pass
             raise
         return "ours", True
     finally:

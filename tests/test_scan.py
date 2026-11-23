@@ -327,6 +327,47 @@ class HotkeyTests(unittest.TestCase):
         with self.assertRaises(scan.ScanError):
             scan.binds_include_panel_chord(b"not-json")
 
+    def test_a_later_save_is_what_gets_the_block(self):
+        stale = b"-- old\n"
+        fresh = stale + b"-- saved while waiting\n"
+        state, rendered = scan.render_panel_hotkey_bytes(fresh)
+        self.assertEqual(state, "set")
+        self.assertIn(b"-- saved while waiting\n", rendered)
+        _stale_state, stale_rendered = scan.render_panel_hotkey_bytes(stale)
+        self.assertNotEqual(rendered, stale_rendered)
+
+    def test_rollback_removes_only_the_marked_block(self):
+        base = b"-- old\n-- saved while waiting\n"
+        _state, rendered = scan.render_panel_hotkey_bytes(base)
+        raced = rendered + b"-- saved while reloading\n"
+        stripped = scan.splice_hotkey_block(raced)
+        self.assertEqual(stripped, base + b"-- saved while reloading\n")
+        self.assertNotIn(b"mellow-ip-scan", stripped)
+        self.assertIsNone(scan.splice_hotkey_block(rendered.replace(b"Mellow IP Scan", b"Other")))
+        self.assertIsNone(scan.splice_hotkey_block(rendered + rendered))
+
+    def test_replace_keeps_a_file_that_changed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = os.open(tmp, os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)
+            try:
+                name = "bindings.lua"
+                fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_CLOEXEC, 0o644, dir_fd=directory)
+                os.write(fd, b"-- current\n")
+                os.close(fd)
+                self.assertFalse(scan.replace_if_current(
+                    directory, name, b"-- stale\n", b"-- stale\nplus\n", scan.MAX_BINDINGS
+                ))
+                blob, mode = scan.read_shared(directory, name, scan.MAX_BINDINGS)
+                self.assertEqual(blob, b"-- current\n")
+                self.assertTrue(scan.replace_if_current(
+                    directory, name, blob, blob + b"next\n", scan.MAX_BINDINGS
+                ))
+                blob, mode = scan.read_shared(directory, name, scan.MAX_BINDINGS)
+                self.assertEqual(blob, b"-- current\nnext\n")
+                self.assertEqual(mode, 0o644)
+            finally:
+                os.close(directory)
+
     def test_shared_write_keeps_mode_and_refuses_a_symlink(self):
         with tempfile.TemporaryDirectory() as tmp:
             directory = os.open(tmp, os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)

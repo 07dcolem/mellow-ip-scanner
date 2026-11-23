@@ -142,7 +142,7 @@ Wake-on-LAN sends one UDP packet to port 9, to the broadcast address of the curr
 
 ## Hotkey
 
-The dropdown offers Super+Alt+N when that chord is free and you have not dismissed the offer. The offer sits under Open full and the host count. `b`, or Set Super+Alt+N (b), writes one marked block at the end of `~/.config/hypr/bindings.lua`, reloads Hyprland, and puts the previous file back if the reload reports a new config error. Nothing is written until you press `b` or click that button. On the host list, `x` dismisses the offer, and the x beside it does the same. That choice is saved, and the offer does not come back. If the chord is already used, the offer is not shown. The full window does not show it.
+The dropdown offers Super+Alt+N when that chord is free and you have not dismissed the offer. The offer sits under Open full and the host count. `b`, or Set Super+Alt+N (b), checks Hyprland, reads `~/.config/hypr/bindings.lua` again, and appends one marked block to that current file. It then reloads Hyprland. If the reload reports a new config error, only that marked block is removed from the file as it is then. Other lines saved in the meantime stay. Nothing is written until you press `b` or click that button. On the host list, `x` dismisses the offer, and the x beside it does the same. That choice is saved, and the offer does not come back. If the chord is already used, the offer is not shown. The full window does not show it.
 
 ```lua
 -- mellow-ip-scan: begin
