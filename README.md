@@ -92,7 +92,7 @@ Esc, or Back, returns to the host you left. From this page, `c`, `m`, `n`, and `
 
 ### Range, ports, columns, and presets
 
-`o` opens the rows in this order: range, re-detect subnet, the TCP-port switch, the port list, the six columns, the preset name, Save preset, then each saved preset. Enter or Space edits a line, re-detects, toggles port checks, raises a column, saves the preset, or applies that preset's range. `x` lowers the focused column or removes the focused preset. On this page `x` does not dismiss the hotkey offer. Esc, or Back, returns to the host you left.
+`o` opens the rows in this order: range, re-detect subnet, the TCP-port switch, the port list, the six columns, the preset name, Save preset, then each saved preset. Under the title, while Super+Alt+N is free, the same Set button is there in the dropdown and in the window. `b` sets it. Its x hides that options offer and remembers the choice. Dismissing the offer under Open full does not hide this one. Enter or Space edits a line, re-detects, toggles port checks, raises a column, saves the preset, or applies that preset's range. Keyboard `x` lowers the focused column or removes the focused preset. It does not dismiss either hotkey offer. Esc, or Back, returns to the host you left.
 
 An empty range, port list, or preset name shows a gray example, such as `192.0.2.0/24` or `home`, until the cursor lands on it.
 
@@ -114,7 +114,7 @@ While a line is open, the page keys wait. Left and right, and Home and End, move
 | `e` | Export the hosts on screen |
 | `w` | Wake-on-LAN for the host you left |
 | `v` | Open the full window, from the dropdown only |
-| `b` | Set Super+Alt+N, from the dropdown, while the offer is showing |
+| `b` | Set Super+Alt+N while an offer is showing. The dropdown offer is under Open full. The options offer is on that page in the dropdown and the window |
 | `x`, Delete | When you are not editing a line: on the host list, while the offer is showing, dismiss it. On Options, lower the focused column or remove the focused preset |
 | Esc | Back to the same host, then close |
 | Left / right, Home, End | While editing a line, move the caret |
