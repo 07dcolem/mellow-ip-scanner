@@ -37,7 +37,6 @@ Item {
     property string hotkeyState: ""
     property bool hotkeyPending: false
     property bool hotkeyDismissed: false
-    property bool optionsHotkeyDismissed: false
     property var hosts: []
     property bool windowOpen: false
     property bool loadedOnce: false
@@ -104,8 +103,6 @@ Item {
             columnsText = normalizeColumns(incoming.columns)
         if (incoming.hotkeyDismissed !== undefined)
             hotkeyDismissed = asBool(incoming.hotkeyDismissed)
-        if (incoming.optionsHotkeyDismissed !== undefined)
-            optionsHotkeyDismissed = asBool(incoming.optionsHotkeyDismissed)
         noted = true
     }
 
@@ -154,10 +151,6 @@ Item {
         saveSettings({ hotkeyDismissed: true })
     }
 
-    function dismissOptionsHotkey() {
-        saveSettings({ optionsHotkeyDismissed: true })
-    }
-
     function clampPresets(value) {
         var parsed = []
         try {
@@ -191,8 +184,7 @@ Item {
             openPortsOnly: openPortsOnly,
             presets: presetsText,
             columns: columnsText,
-            hotkeyDismissed: hotkeyDismissed,
-            optionsHotkeyDismissed: optionsHotkeyDismissed
+            hotkeyDismissed: hotkeyDismissed
         }
     }
 
@@ -242,7 +234,7 @@ Item {
     function saveSettings(patch) {
         var merged = snapshot()
         var incoming = patch || ({})
-        var keys = ["range", "portChecks", "ports", "hideDead", "maxLatencyMs", "openPortsOnly", "presets", "columns", "hotkeyDismissed", "optionsHotkeyDismissed"]
+        var keys = ["range", "portChecks", "ports", "hideDead", "maxLatencyMs", "openPortsOnly", "presets", "columns", "hotkeyDismissed"]
         for (var i = 0; i < keys.length; i++) {
             if (incoming[keys[i]] !== undefined)
                 merged[keys[i]] = incoming[keys[i]]

@@ -11,9 +11,9 @@ FocusScope {
     property var service: null
     property bool showWindowButton: true
     readonly property bool hotkeyOfferVisible: showWindowButton && service && service.noted && service.hotkeyState === "free" && !service.hotkeyDismissed
-    // The options page keeps its own offer. Dismissing the one under Open full
-    // does not hide this one, and this one shows in the window too.
-    readonly property bool optionsHotkeyVisible: service && service.noted && service.hotkeyState === "free" && !service.optionsHotkeyDismissed
+    // Options keeps the set button while the chord is free. Nothing on that
+    // page hides it, in the dropdown or the window.
+    readonly property bool optionsHotkeyVisible: service && service.noted && service.hotkeyState === "free"
     property string page: "list"
     property bool optionCursorUsed: false
     onPageChanged: {
@@ -1335,31 +1335,16 @@ FocusScope {
                     text: strings.t("options.title")
                     foreground: Commons.Color.popups.text
                 }
-                Row {
+                Button {
                     visible: root.optionsHotkeyVisible
-                    width: parent.width
                     height: visible ? implicitHeight : 0
-                    spacing: Style.space(4)
-
-                    Button {
-                        bordered: true
-                        foreground: Commons.Color.popups.text
-                        fontSize: Style.font.caption
-                        horizontalPadding: Style.space(8)
-                        verticalPadding: Style.space(4)
-                        text: Plain.plain(strings.t("hotkey.offer"), 32)
-                        onClicked: if (root.service) root.service.setPanelHotkey()
-                    }
-                    Button {
-                        bordered: true
-                        foreground: Commons.Color.popups.text
-                        fontSize: Style.font.caption
-                        horizontalPadding: Style.space(10)
-                        verticalPadding: Style.space(4)
-                        text: Plain.plain(strings.t("hotkey.dismiss"), 4)
-                        tooltipText: Plain.plain(strings.t("hotkey.dismissTip"), 40)
-                        onClicked: if (root.service) root.service.dismissOptionsHotkey()
-                    }
+                    bordered: true
+                    foreground: Commons.Color.popups.text
+                    fontSize: Style.font.caption
+                    horizontalPadding: Style.space(8)
+                    verticalPadding: Style.space(4)
+                    text: Plain.plain(strings.t("hotkey.offer"), 32)
+                    onClicked: if (root.service) root.service.setPanelHotkey()
                 }
                 PlainLine {
                     id: rangeLine
