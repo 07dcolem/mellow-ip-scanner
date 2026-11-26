@@ -1331,10 +1331,6 @@ FocusScope {
                 visible: root.page === "options"
                 height: visible ? implicitHeight : 0
 
-                PanelSectionHeader {
-                    text: strings.t("options.title")
-                    foreground: Commons.Color.popups.text
-                }
                 Button {
                     visible: root.optionsHotkeyVisible
                     height: visible ? implicitHeight : 0
@@ -1345,6 +1341,10 @@ FocusScope {
                     verticalPadding: Style.space(4)
                     text: Plain.plain(strings.t("hotkey.offer"), 32)
                     onClicked: if (root.service) root.service.setPanelHotkey()
+                }
+                PanelSectionHeader {
+                    text: strings.t("options.title")
+                    foreground: Commons.Color.popups.text
                 }
                 PlainLine {
                     id: rangeLine
