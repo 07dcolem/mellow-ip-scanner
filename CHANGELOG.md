@@ -3,6 +3,7 @@
 ## 0.1.3
 
 - The dropdown is wide enough for the whole key line. `w wake` stays on screen.
+- In the host list, the selected row keeps the stronger fill. The row under the pointer uses the lighter hover fill, in the dropdown and the window.
 
 ## 0.1.2
 

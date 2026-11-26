@@ -884,7 +884,10 @@ FocusScope {
                                 width: hostColumn.width
                                 height: root.rowHeight
                                 radius: Style.cornerRadius
-                                color: index === root.cursor || hostHit.containsMouse ? Style.selectedFill : "transparent"
+                                // Selection stays on the stronger fill. A row under the
+                                // pointer uses the lighter hover fill, including while
+                                // the list scrolls and the pointer rests on another host.
+                                color: index === root.cursor ? Style.selectedFill : (hostHit.containsMouse ? Style.hoverFill : "transparent")
 
                                 HostCells {
                                     anchors.fill: parent
