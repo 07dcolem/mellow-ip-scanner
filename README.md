@@ -170,7 +170,7 @@ No sudo or pkexec is required. The only packets are ping, the optional TCP conne
 
 | Path | What it is |
 | --- | --- |
-| `~/.config/omarchy/shell.json` | Range, ports, filters, column order, presets, and whether the hotkey offer was dismissed, on this widget's entry |
+| `~/.config/omarchy/shell.json` | Range, ports, filters, column order, presets, and whether each hotkey offer was dismissed, on this widget's entry |
 | `~/.local/state/mellow-ip-scan/last-scan.json` | Last scan, including the time it finished. Mode 0600 |
 | `~/Downloads/mellow-ip-scan-*.csv` and `.txt` | Exports you asked for |
 
