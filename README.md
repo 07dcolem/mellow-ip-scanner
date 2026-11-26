@@ -94,7 +94,7 @@ Esc, or Back, returns to the host you left. From this page, `c`, `m`, `n`, and `
 
 `o` opens the rows in this order: range, re-detect subnet, the TCP-port switch, the port list, the six columns, the preset name, Save preset, then each saved preset. Above the Range and ports label, while Super+Alt+N is free, the Set button is there in the dropdown and in the window. `b` sets it. That button stays until the chord is set. Dismissing the offer under Open full does not hide it. Enter or Space edits a line, re-detects, toggles port checks, raises a column, saves the preset, or applies that preset's range. Keyboard `x` lowers the focused column or removes the focused preset. It does not dismiss either hotkey offer. Esc, or Back, returns to the host you left.
 
-An empty range, port list, or preset name shows a gray example, such as `192.0.2.0/24` or `home`, until the cursor lands on it.
+An empty range, port list, or preset name keeps a faded example in the field, such as `192.0.2.0/24` or `home`, until you type. The example stays while that row is highlighted.
 
 ### Editing a line
 
@@ -126,7 +126,7 @@ While a line is open, the page keys wait. Left and right, and Home and End, move
 
 On the bar, left click opens the dropdown. Middle click starts or stops. Right click detects the subnet again.
 
-Click a host to select it. Double-click it to copy the IP. Scan, Filters, Options, Copy IP, Copy MAC, Copy name, Export, and Wake are buttons for the same actions as the keys. Click a field to edit it. An empty field's gray example disappears when you click it. Click a column to raise it, or Lower to move it down. Click a preset to use its range. Remove deletes that preset. Re-detect subnet, Save preset, and Back are rows. Back returns to the same host.
+Click a host to select it. Double-click it to copy the IP. Scan, Filters, Options, Copy IP, Copy MAC, Copy name, Export, and Wake are buttons for the same actions as the keys. Click a field to edit it. An empty field keeps its faded example until you type. Click a column to raise it, or Lower to move it down. Click a preset to use its range. Remove deletes that preset. Re-detect subnet, Save preset, and Back are rows. Back returns to the same host.
 
 Open full (v) is the same as `v`. Set Super+Alt+N (b) is the same as `b`. The x beside the offer is the same as `x` on the host list.
 
