@@ -84,7 +84,7 @@ On the dropdown, while Set Super+Alt+N (b) is on screen, `b` writes that chord a
 
 ### Filters
 
-`f` opens four rows, in order: hide hosts that did not answer, only hosts with an open port, the text line, and the max latency in milliseconds. `j` and `k` move between them. The text line and the latency line show the cursor. An empty line keeps its gray example until the cursor lands on it. Enter or Space toggles a switch or starts the line. `0` in the latency line turns that limit off.
+`f` opens four rows, in order: hide hosts that did not answer, only hosts with an open port, the text line, and the max latency in milliseconds. `j` and `k` move between them. The text line is labeled IP, name, MAC, or vendor, and the latency line is labeled with its unit. An empty line keeps a faded example in the field until you type. `0` there means the latency limit is off, and that `0` is the faded example until you enter a number. Enter or Space toggles a switch or starts the line.
 
 Filters never start a scan. Dead hosts stay hidden until you show them. You can also hide hosts above a latency, keep only hosts with an open port, or match the IP, hostname, MAC, or vendor.
 

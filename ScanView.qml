@@ -1253,35 +1253,61 @@ FocusScope {
                     foreground: Commons.Color.popups.text
                     onClicked: if (root.service) root.service.saveSettings({ openPortsOnly: !root.service.openPortsOnly })
                 }
-                PlainLine {
-                    id: queryLine
+                Column {
                     width: parent.width
-                    maximumLength: 64
-                    placeholder: strings.t("filter.query")
-                    selected: root.page === "filters" && root.cursor === 2
-                    text: root.query
-                    onStarted: root.quietOthers(queryLine)
-                    onAccepted: function(value) {
-                        root.query = value
-                        root.focusKeys()
+                    spacing: Style.space(2)
+
+                    Text {
+                        width: parent.width
+                        textFormat: Text.PlainText
+                        color: Qt.darker(Commons.Color.popups.text, 1.35)
+                        font.family: Style.font.family
+                        font.pixelSize: Style.font.caption
+                        text: strings.t("filter.query")
                     }
-                    onDismissed: root.focusKeys()
+                    PlainLine {
+                        id: queryLine
+                        width: parent.width
+                        maximumLength: 64
+                        placeholder: strings.t("filter.queryExample")
+                        selected: root.page === "filters" && root.cursor === 2
+                        text: root.query
+                        onStarted: root.quietOthers(queryLine)
+                        onAccepted: function(value) {
+                            root.query = value
+                            root.focusKeys()
+                        }
+                        onDismissed: root.focusKeys()
+                    }
                 }
-                PlainLine {
-                    id: latencyLine
+                Column {
                     width: parent.width
-                    maximumLength: 6
-                    placeholder: strings.t("filter.latency")
-                    selected: root.page === "filters" && root.cursor === 3
-                    text: root.service ? String(root.service.maxLatencyMs) : "0"
-                    onStarted: root.quietOthers(latencyLine)
-                    onAccepted: function(value) {
-                        var number = parseInt(value, 10)
-                        if (root.service)
-                            root.service.saveSettings({ maxLatencyMs: isFinite(number) ? number : 0 })
-                        root.focusKeys()
+                    spacing: Style.space(2)
+
+                    Text {
+                        width: parent.width
+                        textFormat: Text.PlainText
+                        color: Qt.darker(Commons.Color.popups.text, 1.35)
+                        font.family: Style.font.family
+                        font.pixelSize: Style.font.caption
+                        text: strings.t("filter.latency")
                     }
-                    onDismissed: root.focusKeys()
+                    PlainLine {
+                        id: latencyLine
+                        width: parent.width
+                        maximumLength: 6
+                        placeholder: strings.t("filter.latencyExample")
+                        selected: root.page === "filters" && root.cursor === 3
+                        text: root.service && root.service.maxLatencyMs > 0 ? String(root.service.maxLatencyMs) : ""
+                        onStarted: root.quietOthers(latencyLine)
+                        onAccepted: function(value) {
+                            var number = parseInt(value, 10)
+                            if (root.service)
+                                root.service.saveSettings({ maxLatencyMs: isFinite(number) ? number : 0 })
+                            root.focusKeys()
+                        }
+                        onDismissed: root.focusKeys()
+                    }
                 }
                 ActionRow {
                     label: strings.t("mouse.back")

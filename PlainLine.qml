@@ -68,7 +68,9 @@ Item {
         font.pixelSize: label.font.pixelSize
     }
 
-    readonly property bool showPlaceholder: text === "" && !editing && !selected
+    // The example stays faded in the field until there is text, including
+    // while the row is highlighted and while the caret is in an empty draft.
+    readonly property bool showPlaceholder: placeholder !== "" && (editing ? draft : text) === ""
 
     Rectangle {
         anchors.fill: parent
