@@ -82,7 +82,9 @@ BarWidget {
         bar: root.bar
         open: root.opened
         focusTarget: panel.loadedContent
-        contentWidth: panel.fittedContentWidth(Style.space(420))
+        // 420px of card is 388px of text after popup padding and the border.
+        // The caption key line is 390px in the 10px monospace face, so "w wake" was cut to "w wa…".
+        contentWidth: panel.fittedContentWidth(Style.space(460))
         contentHeight: panel.fittedContentHeight(panel.loadedContentHeight)
 
         content: ScanView {

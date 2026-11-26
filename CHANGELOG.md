@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- The dropdown is wide enough for the whole key line. `w wake` stays on screen.
+
 ## 0.1.2
 
 - Setting Super+Alt+N reads `bindings.lua` again after the Hyprland checks and appends the marked block to that current file.
