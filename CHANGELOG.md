@@ -4,6 +4,7 @@
 
 - The dropdown is wide enough for the whole key line. `w wake` stays on screen.
 - In the host list, the selected row keeps the stronger fill. The row under the pointer uses the lighter hover fill, in the dropdown and the window.
+- In the full window, name, vendor, and ports grow to the longest value, then share the width that is left. Latency, MAC, and source stay as wide as a full value. Ports stays on its header until a host has an open port. The dropdown still hides a column that does not fit.
 
 ## 0.1.2
 

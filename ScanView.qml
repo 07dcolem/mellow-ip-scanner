@@ -327,6 +327,12 @@ FocusScope {
         font.pixelSize: Style.font.body
     }
 
+    FontMetrics {
+        id: captionMetrics
+        font.family: Style.font.family
+        font.pixelSize: Style.font.caption
+    }
+
     // QML FontMetrics exposes advanceWidth, not QFontMetrics.horizontalAdvance.
     // A missing measurement falls back to a width that still fits the sample.
     function measuredWidth(advance, floor) {
@@ -352,6 +358,52 @@ FocusScope {
                 out.push(parts[i])
         }
         return out
+    }
+    readonly property bool portsHaveValues: {
+        for (var i = 0; i < rows.length; i++) {
+            var host = rows[i]
+            if (host && host.ports && host.ports.length)
+                return true
+        }
+        return false
+    }
+    // Width of each column's longest value in this list, plus its header.
+    // An empty Ports column stops at the header. Independent of the window width.
+    readonly property var measuredColumns: {
+        var widths = []
+        var order = columnIds
+        var source = rows
+        for (var c = 0; c < order.length; c++) {
+            var id = order[c]
+            var width = measuredWidth(captionMetrics.advanceWidth(columnLabel(id)), Style.space(16))
+            if (id === "mac")
+                width = Math.max(width, macWidth)
+            if (!(id === "ports" && !portsHaveValues)) {
+                for (var i = 0; i < source.length; i++) {
+                    var host = source[i]
+                    if (!host)
+                        continue
+                    if (id === "ports" && !(host.ports && host.ports.length))
+                        continue
+                    var textWidth = measuredWidth(bodyMetrics.advanceWidth(cellText(host, id)), 0)
+                    if (textWidth > width)
+                        width = textWidth
+                }
+                if (id === "hostname" || id === "vendor")
+                    width = Math.max(width, columnMin(id))
+            }
+            widths.push({ id: id, width: width })
+        }
+        return widths
+    }
+
+    function measuredFor(id) {
+        var measured = measuredColumns
+        for (var i = 0; i < measured.length; i++) {
+            if (measured[i].id === id)
+                return measured[i].width
+        }
+        return 0
     }
     readonly property var shownColumns: packColumns(listFrame.width)
 
@@ -385,7 +437,23 @@ FocusScope {
         return columnMin(id)
     }
 
+    function columnFloor(id) {
+        return measuredWidth(captionMetrics.advanceWidth(columnLabel(id)), Style.space(16))
+    }
+
+    function columnShares(id) {
+        return id === "hostname" || id === "vendor" || (id === "ports" && portsHaveValues)
+    }
+
     function packColumns(outer) {
+        if (root.showWindowButton)
+            return packDropdownColumns(outer)
+        return packWindowColumns(outer)
+    }
+
+    // The dropdown keeps a column only when its minimum fits, then grows
+    // name, vendor, and ports up to a cap. Later columns stay hidden.
+    function packDropdownColumns(outer) {
         var gap = Style.space(8)
         var inner = Math.max(0, outer - hostList.barGap - Style.space(12))
         var used = ipWidth
@@ -414,6 +482,68 @@ FocusScope {
         for (var n = 0; n < chosen.length; n++)
             out.push({ id: chosen[n], width: widths[n] })
         return out
+    }
+
+    // The window sizes latency, MAC, and source to a full value. Name, vendor,
+    // and ports (once a host has a port) grow to the longest value, then share
+    // whatever width is left. An empty Ports column stays on its header.
+    function packWindowColumns(outer) {
+        var gap = Style.space(8)
+        var inner = Math.max(0, outer - hostList.barGap - Style.space(12))
+        var order = columnIds.slice()
+        while (order.length > 0) {
+            var widths = []
+            var used = ipWidth
+            for (var i = 0; i < order.length; i++) {
+                var pref = measuredFor(order[i])
+                widths.push(pref > 0 ? pref : columnMin(order[i]))
+                used += gap + widths[i]
+            }
+            var extra = inner - used
+            if (extra >= 0) {
+                var flex = []
+                for (var j = 0; j < order.length; j++) {
+                    if (columnShares(order[j]))
+                        flex.push(j)
+                }
+                if (flex.length > 0 && extra > 0) {
+                    var share = Math.floor(extra / flex.length)
+                    var rest = extra - share * flex.length
+                    for (var f = 0; f < flex.length; f++)
+                        widths[flex[f]] += share + (f === flex.length - 1 ? rest : 0)
+                }
+                var fitted = []
+                for (var n = 0; n < order.length; n++)
+                    fitted.push({ id: order[n], width: widths[n] })
+                return fitted
+            }
+            var need = -extra
+            var slack = 0
+            var flexIdx = []
+            for (var k = 0; k < order.length; k++) {
+                if (!columnShares(order[k]))
+                    continue
+                flexIdx.push(k)
+                slack += Math.max(0, widths[k] - columnFloor(order[k]))
+            }
+            if (slack >= need && flexIdx.length > 0) {
+                var removed = 0
+                for (var t = 0; t < flexIdx.length; t++) {
+                    var idx = flexIdx[t]
+                    var room = Math.max(0, widths[idx] - columnFloor(order[idx]))
+                    var cut = t === flexIdx.length - 1 ? need - removed : Math.floor(need * room / slack)
+                    cut = Math.max(0, Math.min(cut, room, need - removed))
+                    widths[idx] -= cut
+                    removed += cut
+                }
+                var squeezed = []
+                for (var s = 0; s < order.length; s++)
+                    squeezed.push({ id: order[s], width: widths[s] })
+                return squeezed
+            }
+            order.pop()
+        }
+        return []
     }
 
     function columnShown(id) {
